@@ -1,6 +1,7 @@
 import pygame
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from OpenGL.GLUT import *  # For drawing text
 
 GRID_SIZE = 5
 CELL_SIZE = 100  
@@ -48,7 +49,7 @@ def draw_texture(x, y, texture):
     """Draws a textured square at (x, y) using OpenGL."""
     glEnable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, texture)
-    glColor3f(1, 1, 1)  # Ensure no tint is applied
+    glColor3f(1, 1, 1)  # Reset color to white
 
     glBegin(GL_QUADS)
     glTexCoord2f(0, 0); glVertex2f(x * CELL_SIZE, y * CELL_SIZE)
@@ -60,26 +61,11 @@ def draw_texture(x, y, texture):
     glDisable(GL_TEXTURE_2D)
 
 def draw_emoji(x, y):
-    """Draws the agent emoji with original (white) colors."""
+    """Draws the agent emoji."""
     global agent_texture
     if agent_texture is None:
         agent_texture = load_texture("agent.png")
-    glEnable(GL_TEXTURE_2D)
-    glBindTexture(GL_TEXTURE_2D, agent_texture)
-    
-    # Force the texture's original colors by replacing the fragment color with the texture's color
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE)
-    
-    glBegin(GL_QUADS)
-    glTexCoord2f(0, 0); glVertex2f(x * CELL_SIZE, y * CELL_SIZE)
-    glTexCoord2f(1, 0); glVertex2f((x + 1) * CELL_SIZE, y * CELL_SIZE)
-    glTexCoord2f(1, 1); glVertex2f((x + 1) * CELL_SIZE, (y + 1) * CELL_SIZE)
-    glTexCoord2f(0, 1); glVertex2f(x * CELL_SIZE, (y + 1) * CELL_SIZE)
-    glEnd()
-    
-    # Reset to the default modulation mode for subsequent textures
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
-    glDisable(GL_TEXTURE_2D)
+    draw_texture(x, y, agent_texture)
 
 def draw_waste(x, y, waste_type):
     """Draws the waste emoji based on its type."""
@@ -104,8 +90,22 @@ def draw_bin(x, y, bin_type):
         texture = nonrecyclable_bin_texture
     draw_texture(x, y, texture)
 
-def render_scene(agent_pos, waste_pos, waste_type, holding, bin_positions):
-    """Renders the grid, bins, waste (if not held), and agent."""
+def draw_text(x, y, text_string):
+    """Draws text using GLUT bitmap fonts."""
+    glColor3f(1, 1, 1)
+    glWindowPos2f(x, y)
+    for ch in text_string:
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, ord(ch))
+
+def render_scene(agent_pos, waste_pos, waste_type, holding, bin_positions, total_reward, episode_end):
+    """
+    Renders the entire scene:
+      - Draws the grid.
+      - Draws the bins at their fixed positions.
+      - If the agent is not holding waste, draws the waste.
+      - Draws the agent.
+      - Draws a scoreboard at the top showing the total reward and, if applicable, an "Episode Ended" message.
+    """
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     
     draw_grid()
@@ -113,11 +113,16 @@ def render_scene(agent_pos, waste_pos, waste_type, holding, bin_positions):
     draw_bin(bin_positions["recyclable"][0], bin_positions["recyclable"][1], "recyclable")
     draw_bin(bin_positions["non-recyclable"][0], bin_positions["non-recyclable"][1], "non-recyclable")
     
-    # Draw waste only if the agent is not holding it
+    # Draw the waste only if the agent is not holding it
     if not holding:
         draw_waste(waste_pos[0], waste_pos[1], waste_type)
     
     draw_emoji(agent_pos[0], agent_pos[1])
+    
+    # Draw the scoreboard at the top of the window
+    draw_text(10, 20, f"Total Reward: {total_reward}")
+    if episode_end:
+        draw_text(10, 40, "Episode Ended")
 
 def init_opengl():
     """Initializes OpenGL settings."""
@@ -127,3 +132,5 @@ def init_opengl():
     glOrtho(0, WINDOW_SIZE, WINDOW_SIZE, 0, -1, 1)  
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
+    # Initialize GLUT (needed for text rendering)
+    glutInit()

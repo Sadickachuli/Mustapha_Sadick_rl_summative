@@ -13,12 +13,14 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    # Sample a random action (0: up, 1: down, 2: left, 3: right, 4: interact)
     action = env.action_space.sample()
     state, reward, done, _ = env.step(action)
 
     print(f"Action Taken: {action}, New State: {state}, Reward: {reward}")
     
-    env.render()
+    # Render the scene, passing 'done' so that if the episode ended the scoreboard shows "Episode Ended"
+    env.render(episode_end=done)
     pygame.time.wait(500)  # Delay for visualization
 
     if done:
