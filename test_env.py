@@ -7,7 +7,6 @@ done = False
 
 print("Initial State:", state)
 
-# Start a rendering loop
 running = True
 while running:
     for event in pygame.event.get():
@@ -20,7 +19,7 @@ while running:
     print(f"Action Taken: {action}, New State: {state}, Reward: {reward}")
     
     env.render()
-    pygame.time.wait(500)  # Delay to visualize movements
+    pygame.time.wait(500)  # Delay for visualization
 
     if done:
         state, _ = env.reset()
