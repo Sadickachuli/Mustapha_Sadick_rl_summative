@@ -2,32 +2,37 @@
 import os
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnRewardThreshold
-from environment.custom_env import WasteCollectionEnv
+from environment.custom_env import LocateWasteEnv
 
 def train():
     # Create the environment.
-    env = WasteCollectionEnv()
+    env = LocateWasteEnv(grid_size=5, max_steps=50)
     
-    # Create the directory to save models if it doesn't exist.
+    # Create directory for saving models.
     models_dir = "models/pg/"
     os.makedirs(models_dir, exist_ok=True)
     
-    # Setup an evaluation environment and callbacks to monitor progress.
-    eval_env = WasteCollectionEnv()
-    callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=5, verbose=1)  # Adjust threshold as needed
-    eval_callback = EvalCallback(eval_env, best_model_save_path=models_dir,
-                                 log_path=models_dir, eval_freq=5000,
-                                 deterministic=True, render=False, callback_after_eval=callback_on_best)
+    # Setup evaluation environment and callback.
+    eval_env = LocateWasteEnv(grid_size=5, max_steps=50)
+    callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=15, verbose=1)
+    eval_callback = EvalCallback(
+        eval_env, 
+        best_model_save_path=models_dir,
+        log_path=models_dir, 
+        eval_freq=2000, 
+        deterministic=True, 
+        render=False, 
+        callback_after_eval=callback_on_best
+    )
     
-    # Initialize PPO with a MLP policy.
-    # Increased learning rate and added entropy coefficient to boost exploration.
-    model = PPO("MlpPolicy", env, verbose=1, learning_rate=0.0005, gamma=0.99, ent_coef=0.01)
+    # Initialize PPO with an MLP policy.
+    model = PPO("MlpPolicy", env, verbose=1, learning_rate=0.0005, gamma=0.99)
     
-    # Train the model for a given number of timesteps.
-    model.learn(total_timesteps=100000, callback=eval_callback)
+    # Train the model.
+    model.learn(total_timesteps=50000, callback=eval_callback)
     
     # Save the trained model.
-    model.save(models_dir + "ppo_waste(4)")
+    model.save(models_dir + "ppo_locate")
     
     print("Training completed and model saved.")
     
