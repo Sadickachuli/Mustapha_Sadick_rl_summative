@@ -75,13 +75,14 @@ class WasteCollectionEnv(gym.Env):
         return np.array(obs, dtype=np.int32)
     
     def _get_target(self):
-        # Determine target: if not carrying waste, target nearest available waste.
+        # When not carrying waste, target the nearest available waste.
         # If carrying waste, target the bin.
         if self.has_waste == 0:
             candidates = [waste['pos'] for waste in self.waste_items if waste['exists'] == 1]
             if candidates:
                 distances = [abs(self.agent_pos[0]-p[0]) + abs(self.agent_pos[1]-p[1]) for p in candidates]
-                return candidates[distances.index(min(distances))]
+                min_index = distances.index(min(distances))
+                return candidates[min_index]
             else:
                 return self.bin_pos
         else:
@@ -98,7 +99,7 @@ class WasteCollectionEnv(gym.Env):
         info = {}
         self.steps += 1
 
-        # Extra penalty for repeating the same movement action.
+        # Penalty for repeating the same movement action.
         if self.last_action is not None and action == self.last_action and action in [0, 1, 2, 3]:
             base_reward -= 0.05
 
@@ -127,43 +128,42 @@ class WasteCollectionEnv(gym.Env):
             else:
                 base_reward -= 1
         elif action == 4:  # Pick up waste
-            # Only allow pickup if agent is exactly on a waste position and not carrying waste.
-            available_waste_positions = [waste['pos'] for waste in self.waste_items if waste['exists'] == 1]
             if self.has_waste == 0:
-                if tuple(self.agent_pos) in available_waste_positions:
-                    for waste in self.waste_items:
-                        if waste['exists'] == 1 and tuple(self.agent_pos) == waste['pos']:
-                            waste['exists'] = 0
-                            self.has_waste = 1
-                            base_reward += 10  # Reward for successful pickup.
-                            break
-                else:
-                    base_reward -= 5  # Heavy penalty for invalid pickup.
+                picked = False
+                for waste in self.waste_items:
+                    if waste['exists'] == 1 and tuple(self.agent_pos) == waste['pos']:
+                        waste['exists'] = 0
+                        self.has_waste = 1
+                        base_reward += 10  # Stronger reward for pickup.
+                        picked = True
+                        break
+                if not picked:
+                    base_reward -= 1
             else:
-                base_reward -= 5  # Heavy penalty if already carrying waste.
+                base_reward -= 1
         elif action == 5:  # Drop waste
             if self.has_waste == 1:
                 if tuple(self.agent_pos) == self.bin_pos:
                     self.has_waste = 0
-                    base_reward += 30  # Reward for correct drop-off.
+                    base_reward += 30  # Stronger reward for correct drop-off.
                 else:
-                    base_reward -= 5  # Heavy penalty for dropping in wrong location.
+                    base_reward -= 1
             else:
-                base_reward -= 5  # Heavy penalty for dropping when not carrying waste.
+                base_reward -= 1
         else:
             base_reward -= 1
         
         self.last_action = action
         
-        # Update shaping reward.
+        # Update distance for shaping rewards.
         self._update_prev_distance()
         new_distance = self.prev_distance
-        # Shaping reward: positive if agent moves closer to target.
+        # Increase shaping coefficient (now 1.0) to provide a stronger signal.
         shaping_reward = 1.0 * (prev_distance - new_distance)
         
         total_reward = base_reward + shaping_reward
 
-        # Check if mission is complete (all waste delivered).
+        # Mission complete: all waste delivered.
         all_delivered = all(waste['exists'] == 0 for waste in self.waste_items) and self.has_waste == 0
         if all_delivered:
             terminated = True

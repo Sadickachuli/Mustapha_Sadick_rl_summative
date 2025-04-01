@@ -65,7 +65,7 @@ def simulate_trained_model(model_path):
         pygame.draw.circle(screen, (0, 0, 255), agent_center, cell_size // 3)
         
         pygame.display.flip()
-        clock.tick(5)  # Adjust the frame rate as needed
+        clock.tick(5)  
 
         if done:
             print("Episode finished. Resetting environment...")
@@ -75,5 +75,4 @@ def simulate_trained_model(model_path):
     pygame.quit()
 
 if __name__ == '__main__':
-    # Replace the path with the location where your model is saved.
     simulate_trained_model("models/pg/ppo_waste(3).zip")
