@@ -4,14 +4,14 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import math
 
-# New color definitions in normalized RGB (0-1)
+# color definitions 
 COLORS = {
-    'background': (1.0, 1.0, 1.0),              
-    'cell': (0.4, 0.2, 0.7),                 
+    'background': (1.0, 1.0, 1.0),              # White background
+    'cell': (0.4, 0.2, 0.7),                    # Light purple cells
     'grid': (0.8, 0.7, 0.9), 
-    'agent': (0.68, 0.85, 0.90),  
-    'waste': (0.55, 0.27, 0.07),           
-    'bin': (0.0, 1.0, 0.0)                    
+    'agent': (0.68, 0.85, 0.90),                # Light blue agent
+    'waste': (0.55, 0.27, 0.07),                # Brown waste
+    'bin': (0.0, 1.0, 0.0)                      # Green bin
 }
 
 def draw_filled_rect(x, y, w, h, color):
@@ -32,15 +32,16 @@ def draw_circle(cx, cy, radius, color, segments=32):
         glVertex2f(cx + math.cos(angle) * radius, cy + math.sin(angle) * radius)
     glEnd()
 
-def render_waste_env(env):
-    # Set window size based on grid size. Here we use 600x600.
-    window_size = 600
+def render_waste_env(env, screen):
+    """
+    Renders the environment onto the provided 'screen'.
+    Assumes that 'screen' has already been created (i.e. pygame.display.set_mode was called).
+    """
+    # Get window dimensions from the screen.
+    window_size = screen.get_width() 
     cell_size = window_size / env.grid_size
 
-    pygame.init()
-    # Use double buffering with OpenGL
-    screen = pygame.display.set_mode((window_size, window_size), pygame.OPENGL | pygame.DOUBLEBUF)
-    
+    # Clear the buffer with background color.
     glClearColor(*COLORS['background'], 1.0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
@@ -70,7 +71,6 @@ def render_waste_env(env):
     # Draw waste as a circle (brown) if not carried
     if not env.carrying_waste:
         wx, wy = env.waste_pos
-        # Draw waste circle in center of cell with radius 0.35
         draw_circle(wx + 0.5, wy + 0.5, 0.35, COLORS['waste'])
     
     # Draw agent as a circle (light blue)
@@ -78,5 +78,4 @@ def render_waste_env(env):
     draw_circle(ax + 0.5, ay + 0.5, 0.35, COLORS['agent'])
     
     pygame.display.flip()
-    # Wait a short time to let the frame show
     pygame.time.wait(100)
