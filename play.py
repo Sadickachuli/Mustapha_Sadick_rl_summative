@@ -1,45 +1,41 @@
 # play.py
-import time
 import pygame
-from environment.custom_env import LocateWasteEnv
-from environment.rendering import draw_locate_waste_frame
+import time
+import random
+from environment.custom_env import WasteCollectionEnv
 
 def play():
-    # Create the simplified environment.
-    env = LocateWasteEnv(grid_size=5, max_steps=50)
+    # Create the environment with render_mode enabled so it uses OpenGL rendering.
+    env = WasteCollectionEnv(grid_size=5, max_steps=100, render_mode='human')
     obs, _ = env.reset()
     
-    # Set up pygame display.
+    # Initialize Pygame (required for handling events)
     pygame.init()
-    cell_size = 100
-    grid_size = env.grid_size
-    width = cell_size * grid_size
-    height = cell_size * grid_size
-    screen = pygame.display.set_mode((width, height))
-    pygame.display.set_caption("Play: Locate Waste Environment (Random Policy)")
-    clock = pygame.time.Clock()
-    
     running = True
+    clock = pygame.time.Clock()
+
     while running:
+        # Process Pygame events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
+        # For this test, only use movement actions (0: up, 1: down, 2: left, 3: right)
+        action = random.choice([0, 1, 2, 3])
+        obs, reward, terminated, truncated, _ = env.step(action)
         
-        # For demonstration, take a random action.
-        action = env.action_space.sample()
-        obs, reward, terminated, truncated, info = env.step(action)
-        
-        # Draw current frame.
-        draw_locate_waste_frame(env, screen, cell_size)
-        pygame.display.flip()
-        clock.tick(5)  # Slow down the simulation for visualization.
-        
-        # If episode finished, reset the environment.
+        # Call the environment's render function (which uses OpenGL)
+        env.render()
+
+        # If the episode ends (due to termination or max steps), reset the environment
         if terminated or truncated:
             print("Episode finished. Resetting environment...")
             time.sleep(1)
             obs, _ = env.reset()
-    
+        
+        # Control simulation speed (adjust FPS as needed)
+        clock.tick(2)  # e.g., 2 FPS for clear visualization
+
     pygame.quit()
 
 if __name__ == '__main__':

@@ -1,58 +1,82 @@
 # environment/rendering.py
 import pygame
+from OpenGL.GL import *
+from OpenGL.GLU import *
+import math
 
-# Define colors
-WHITE = (255, 255, 255)
-BLUE = (0, 0, 255)      # Agent
-BROWN = (139, 69, 19)   # Waste
-GRAY = (200, 200, 200)  # Grid lines
+# New color definitions in normalized RGB (0-1)
+COLORS = {
+    'background': (1.0, 1.0, 1.0),              # White
+    'cell': (0.4, 0.2, 0.7),                                 # Light Purple cells
+    'grid': (0.8, 0.7, 0.9),                    # Slightly darker purple for grid lines
+    'agent': (0.68, 0.85, 0.90),                # Light Blue for agent
+    'waste': (0.55, 0.27, 0.07),                # Brown for waste
+    'bin': (0.0, 1.0, 0.0)                      # Green for bin
+}
 
-def draw_locate_waste_frame(env, screen, cell_size):
-    """
-    Draws a single frame of the LocateWasteEnv on the given screen.
-    """
-    width = cell_size * env.grid_size
-    height = cell_size * env.grid_size
-    screen.fill(WHITE)
-    
-    # Draw grid lines.
-    for x in range(0, width, cell_size):
-        pygame.draw.line(screen, GRAY, (x, 0), (x, height))
-    for y in range(0, height, cell_size):
-        pygame.draw.line(screen, GRAY, (0, y), (width, y))
-    
-    # Draw the waste as a brown square.
-    wx, wy = env.waste_pos
-    waste_rect = pygame.Rect(wx * cell_size + 20, wy * cell_size + 20, cell_size - 40, cell_size - 40)
-    pygame.draw.rect(screen, BROWN, waste_rect)
-    
-    # Draw the agent as a blue circle.
-    ax, ay = env.agent_pos
-    agent_center = (ax * cell_size + cell_size // 2, ay * cell_size + cell_size // 2)
-    pygame.draw.circle(screen, BLUE, agent_center, cell_size // 3)
+def draw_filled_rect(x, y, w, h, color):
+    glColor3f(*color)
+    glBegin(GL_QUADS)
+    glVertex2f(x, y)
+    glVertex2f(x+w, y)
+    glVertex2f(x+w, y+h)
+    glVertex2f(x, y+h)
+    glEnd()
 
-def render_locate_waste_environment(env):
-    """
-    Runs a continuous loop that renders the current state of the LocateWasteEnv.
-    Useful for quick debugging.
-    """
+def draw_circle(cx, cy, radius, color, segments=32):
+    glColor3f(*color)
+    glBegin(GL_TRIANGLE_FAN)
+    glVertex2f(cx, cy)
+    for i in range(segments+1):
+        angle = 2 * math.pi * i / segments
+        glVertex2f(cx + math.cos(angle) * radius, cy + math.sin(angle) * radius)
+    glEnd()
+
+def render_waste_env(env):
+    # Set window size based on grid size. Here we use 600x600.
+    window_size = 600
+    cell_size = window_size / env.grid_size
+
     pygame.init()
-    cell_size = 100
-    grid_size = env.grid_size
-    width = cell_size * grid_size
-    height = cell_size * grid_size
-    screen = pygame.display.set_mode((width, height))
-    pygame.display.set_caption("Locate Waste Environment")
+    # Use double buffering with OpenGL
+    screen = pygame.display.set_mode((window_size, window_size), pygame.OPENGL | pygame.DOUBLEBUF)
     
-    clock = pygame.time.Clock()
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-        
-        draw_locate_waste_frame(env, screen, cell_size)
-        pygame.display.flip()
-        clock.tick(30)
+    glClearColor(*COLORS['background'], 1.0)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    glLoadIdentity()
+    gluOrtho2D(0, env.grid_size, 0, env.grid_size)
+
+    # Draw cells: fill each cell with light purple.
+    for i in range(env.grid_size):
+        for j in range(env.grid_size):
+            draw_filled_rect(i, j, 1, 1, COLORS['cell'])
     
-    pygame.quit()
+    # Draw grid lines
+    glColor3f(*COLORS['grid'])
+    glLineWidth(2)
+    glBegin(GL_LINES)
+    for i in range(env.grid_size + 1):
+        glVertex2f(i, 0)
+        glVertex2f(i, env.grid_size)
+    for j in range(env.grid_size + 1):
+        glVertex2f(0, j)
+        glVertex2f(env.grid_size, j)
+    glEnd()
+
+    # Draw bin as a square (green)
+    bx, by = env.bin_pos
+    draw_filled_rect(bx + 0.1, by + 0.1, 0.8, 0.8, COLORS['bin'])
+
+    # Draw waste as a circle (brown) if not carried
+    if not env.carrying_waste:
+        wx, wy = env.waste_pos
+        # Draw waste circle in center of cell with radius 0.35
+        draw_circle(wx + 0.5, wy + 0.5, 0.35, COLORS['waste'])
+    
+    # Draw agent as a circle (light blue)
+    ax, ay = env.agent_pos
+    draw_circle(ax + 0.5, ay + 0.5, 0.35, COLORS['agent'])
+    
+    pygame.display.flip()
+    # Wait a short time to let the frame show
+    pygame.time.wait(100)
