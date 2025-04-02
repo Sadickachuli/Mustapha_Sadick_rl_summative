@@ -9,7 +9,7 @@ def train():
     models_dir = "models/pg/"
     os.makedirs(models_dir, exist_ok=True)
 
-    # Use MultiInputPolicy for dictionary observations
+    # Using MultiInputPolicy for dictionary observations
     model = PPO(
         "MultiInputPolicy",
         env,

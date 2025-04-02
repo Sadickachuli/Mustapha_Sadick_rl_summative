@@ -6,12 +6,12 @@ import math
 
 # New color definitions in normalized RGB (0-1)
 COLORS = {
-    'background': (1.0, 1.0, 1.0),              # White
-    'cell': (0.4, 0.2, 0.7),                                 # Light Purple cells
-    'grid': (0.8, 0.7, 0.9),                    # Slightly darker purple for grid lines
-    'agent': (0.68, 0.85, 0.90),                # Light Blue for agent
-    'waste': (0.55, 0.27, 0.07),                # Brown for waste
-    'bin': (0.0, 1.0, 0.0)                      # Green for bin
+    'background': (1.0, 1.0, 1.0),              
+    'cell': (0.4, 0.2, 0.7),                 
+    'grid': (0.8, 0.7, 0.9), 
+    'agent': (0.68, 0.85, 0.90),  
+    'waste': (0.55, 0.27, 0.07),           
+    'bin': (0.0, 1.0, 0.0)                    
 }
 
 def draw_filled_rect(x, y, w, h, color):
