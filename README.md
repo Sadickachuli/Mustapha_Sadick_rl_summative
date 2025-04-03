@@ -5,6 +5,7 @@ This project uses **Reinforcement Learning** to train an **agent** that efficien
 
 https://github.com/user-attachments/assets/59d513e8-89d2-4b0f-96f2-9d525f3e0c7c
 
+![Waste Management RL Demo](https://github.com/user-attachments/assets/59d513e8-89d2-4b0f-96f2-9d525f3e0c7c)
 
 
 
