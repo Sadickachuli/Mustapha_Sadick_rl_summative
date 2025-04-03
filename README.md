@@ -19,7 +19,7 @@ This project uses **Reinforcement Learning** to train an **agent** that efficien
 
 ## **📂 Project Structure**
 ```bash
-waste-management-rl/
+Mustapha_Sadick_rl_summative/
 ├── dqn_logs/                
 │   ├── cumulative_rewards.png          
 │   ├── dqn_reward_history.npy         
@@ -59,7 +59,7 @@ waste-management-rl/
 └── .gitignore                       # Ignore unnecessary files
 ```
 
-## ** Setup Instructions**
+## **Setup Instructions**
 ### **1️. Clone the Repository**
 ```bash
 git clone https://github.com/Sadickachuli/Mustapha_Sadick_rl_summative.git
@@ -95,14 +95,14 @@ python playppo.py # To test the trained PPO agent
 
 
 
-🛠 Future Improvements
+## **Future Improvements**
 - Fine-tuning hyperparameters for better performance for DQN
 - Fix the agent being stuck in a loop for DQN
 - Experimenting with alternative RL algorithms (SAC, TRPO)
 - Implementing curriculum learning to gradually increase difficulty
 - Add two bins(one for recyclable waste and the other for non-recyclable waste)
 
-📜 License
+## **📜 License**
 This project is licensed under the MIT License. See LICENSE for details.
 
 📞 Contact
