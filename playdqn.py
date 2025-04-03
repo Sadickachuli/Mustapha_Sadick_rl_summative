@@ -1,7 +1,7 @@
-# play_trained.py
+# playdqn.py
 import pygame
 import time
-from stable_baselines3 import PPO
+from stable_baselines3 import DQN
 from environment.custom_env import WasteCollectionEnv
 from environment.rendering import render_waste_env
 
@@ -23,15 +23,15 @@ def log_episode(state):
     print("-" * 60)
 
 def simulate_trained_model(model_path):
-    # Initialize Pygame and create the display.
+    # Initialize Pygame and create the display
     pygame.init()
     window_size = 600
     screen = pygame.display.set_mode((window_size, window_size), pygame.OPENGL | pygame.DOUBLEBUF)
-    pygame.display.set_caption("Trained Waste Collection Simulation")
+    pygame.display.set_caption("Trained DQN Waste Collection Simulation")
     
-    # environment with render_mode enabled.
+    # Load environment and DQN model
     env = WasteCollectionEnv(grid_size=5, max_steps=100, render_mode='human')
-    model = PPO.load(model_path)
+    model = DQN.load(model_path)
     
     obs, _ = env.reset()
     clock = pygame.time.Clock()
@@ -39,24 +39,25 @@ def simulate_trained_model(model_path):
 
     running = True
     while running:
-        clock.tick(2)  
+        clock.tick(2)  # Control simulation speed
 
-        # Process Pygame events.
+        # Process Pygame events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
         
-        # Predict action.
+        # Get DQN model's action prediction
         action, _ = model.predict(obs, deterministic=True)
         obs, reward, terminated, truncated, _ = env.step(action)
 
-        # Update metrics.
+        # Update performance metrics
         state.total_reward += reward
         state.steps += 1
 
-        # Render environment using the provided screen.
+        # Render the environment state
         render_waste_env(env, screen)
 
+        # Handle episode completion
         if terminated or truncated:
             log_episode(state)
             obs, _ = env.reset()
@@ -68,4 +69,5 @@ def simulate_trained_model(model_path):
     pygame.quit()
 
 if __name__ == '__main__':
-    simulate_trained_model("models/pg/ppo_collection(2).zip")
+    # Updated path to DQN model
+    simulate_trained_model("models/dqn/dqn_final_model.zip")
