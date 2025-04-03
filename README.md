@@ -2,7 +2,11 @@
 
 This project uses **Reinforcement Learning** to train an **agent** that efficiently collects and disposes of waste in a grid-based environment. The agent learns to **navigate**, **pick up waste**, and **drop it in a bin** using and comparing **Proximal Policy Optimization (PPO)** and **Deep Q Network**.
 
-![rand_vid](https://github.com/user-attachments/assets/03f8c42e-ca71-45e9-b95c-b5c94ff8a843)
+
+https://github.com/user-attachments/assets/59d513e8-89d2-4b0f-96f2-9d525f3e0c7c
+
+
+
 
 ## ** Features**
 -  **Custom Gym Environment** for waste collection  
