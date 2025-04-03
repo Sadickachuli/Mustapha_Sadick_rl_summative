@@ -7,7 +7,7 @@ This project uses **Reinforcement Learning** to train an **agent** that efficien
 
 
 
-## ** Features**
+## **Features**
 -  **Custom Gym Environment** for waste collection  
 -  **Deep Reinforcement Learning** with PPO and DQN (Stable-Baselines3)  
 -  **PyOpenGL + Pygame Rendering** for real-time visualization  
