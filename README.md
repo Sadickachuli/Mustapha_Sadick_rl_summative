@@ -1,6 +1,6 @@
 # **Reinforcement Learning for Waste Management**  
 
-This project uses **Reinforcement Learning ** to train an **agent** that efficiently collects and disposes of waste in a grid-based environment. The agent learns to **navigate**, **pick up waste**, and **drop it in a bin** using and comparing **Proximal Policy Optimization (PPO)** and **Deep Q Network**.
+This project uses **Reinforcement Learning** to train an **agent** that efficiently collects and disposes of waste in a grid-based environment. The agent learns to **navigate**, **pick up waste**, and **drop it in a bin** using and comparing **Proximal Policy Optimization (PPO)** and **Deep Q Network**.
 
 ![rand_vid](https://github.com/user-attachments/assets/03f8c42e-ca71-45e9-b95c-b5c94ff8a843)
 
