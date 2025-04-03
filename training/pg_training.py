@@ -21,12 +21,12 @@ class TrainingLoggerCallback(BaseCallback):
             episode_reward = self.locals["infos"][0].get("episode", {}).get("r")
             if episode_reward is not None:
                 self.episode_rewards.append(episode_reward)
-                print(f"Episode Reward Logged: {episode_reward}")  # Debugging print
+                print(f"Episode Reward Logged: {episode_reward}") 
 
         # Log entropy value from policy
         entropy = float(self.model.logger.name_to_value.get("entropy_loss", 0))
         self.entropy_values.append(entropy)
-        print(f"Entropy Logged: {entropy}")  # Debugging print
+        print(f"Entropy Logged: {entropy}") 
 
         return True
 

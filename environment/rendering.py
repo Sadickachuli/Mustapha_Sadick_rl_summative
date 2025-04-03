@@ -10,9 +10,8 @@ COLORS = {
     'cell': (0.4, 0.2, 0.7),                    # Light purple cells
     'grid': (0.8, 0.7, 0.9), 
     'agent_body': (0.0, 0.0, 1.0),              # Blue agent body
-    'agent_head': (0.68, 0.85, 0.90),           # Light blue agent head
-    'waste': (0.55, 0.27, 0.07)                 # Brown waste
-    # The bin will be drawn using a texture image.
+    'agent_head': (1.0, 1.0, 0.90),          
+    'waste': (0.55, 0.27, 0.07)                 
 }
 
 # Global variable for bin texture
@@ -20,8 +19,8 @@ BIN_TEXTURE = None
 
 def load_texture(image_path):
     """Loads an image as an OpenGL texture without flipping it, and with transparency enabled."""
-    img = pygame.image.load(image_path)  # Do not flip the image
-    img = img.convert_alpha()             # Ensure the alpha channel is used
+    img = pygame.image.load(image_path) 
+    img = img.convert_alpha()       
     img_data = pygame.image.tostring(img, "RGBA", True)
     width, height = img.get_size()
 
@@ -46,7 +45,7 @@ def draw_textured_rect(x, y, w, h, texture):
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     
-    glColor3f(1, 1, 1)  # Use white to keep original texture colors
+    glColor3f(1, 1, 1) 
     glBegin(GL_QUADS)
     glTexCoord2f(0, 0); glVertex2f(x, y)
     glTexCoord2f(1, 0); glVertex2f(x + w, y)
@@ -84,9 +83,9 @@ def render_waste_env(env, screen):
     """
     global BIN_TEXTURE
     if BIN_TEXTURE is None:
-        BIN_TEXTURE = load_texture("images/recycle-bin.png")  # Path to your bin image
+        BIN_TEXTURE = load_texture("images/recycle-bin.png")  
 
-    window_size = screen.get_width()  # Assuming a square window
+    window_size = screen.get_width()  
     cell_size = window_size / env.grid_size
 
     # Clear the buffer with the background color.
@@ -95,12 +94,12 @@ def render_waste_env(env, screen):
     glLoadIdentity()
     gluOrtho2D(0, env.grid_size, 0, env.grid_size)
 
-    # Draw cells: fill each cell with light purple.
+    # Drawing cells
     for i in range(env.grid_size):
         for j in range(env.grid_size):
             draw_filled_rect(i, j, 1, 1, COLORS['cell'])
     
-    # Draw grid lines.
+    # Drawing grid lines.
     glColor3f(*COLORS['grid'])
     glLineWidth(2)
     glBegin(GL_LINES)
@@ -112,19 +111,19 @@ def render_waste_env(env, screen):
         glVertex2f(env.grid_size, j)
     glEnd()
 
-    # Draw bin using texture.
+    # drawing bin 
     bx, by = env.bin_pos
     draw_textured_rect(bx + 0.1, by + 0.1, 0.8, 0.8, BIN_TEXTURE)
 
-    # Draw waste as a circle (brown) if not carried.
+    # drawing waste 
     if not env.carrying_waste:
         wx, wy = env.waste_pos
         draw_circle(wx + 0.5, wy + 0.5, 0.35, COLORS['waste'])
     
-    # Draw agent: square body with a circular head.
+    # Drawing agent
     ax, ay = env.agent_pos
-    draw_filled_rect(ax + 0.2, ay + 0.1, 0.6, 0.6, COLORS['agent_body'])  # Square body.
-    draw_circle(ax + 0.5, ay + 0.75, 0.2, COLORS['agent_head'])  # Circular head.
+    draw_filled_rect(ax + 0.2, ay + 0.1, 0.6, 0.6, COLORS['agent_body'])
+    draw_circle(ax + 0.5, ay + 0.75, 0.2, COLORS['agent_head']) 
     
     pygame.display.flip()
     pygame.time.wait(100)

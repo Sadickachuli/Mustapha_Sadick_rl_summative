@@ -28,7 +28,7 @@ class TrainingLoggerCallback(BaseCallback):
 def train():
     env = WasteCollectionEnv(grid_size=5, max_steps=100)
     
-    # Modified paths
+    # paths
     models_dir = "models/dqn/"
     log_dir = "dqn_logs/"
     best_model_dir = os.path.join(models_dir, "best/")
@@ -57,8 +57,6 @@ def train():
     model.set_logger(new_logger)
 
     training_logger = TrainingLoggerCallback(log_dir)
-    
-    # Updated evaluation callback path
     eval_callback = EvalCallback(
         env, 
         best_model_save_path=best_model_dir,
@@ -70,7 +68,7 @@ def train():
 
     model.learn(total_timesteps=100000, callback=[training_logger, eval_callback])
     
-    # Updated model save name
+    # model save
     model.save(os.path.join(models_dir, "dqn_final_model"))
     print("DQN training completed and model saved to separate directory.")
 

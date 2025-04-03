@@ -39,7 +39,7 @@ def simulate_trained_model(model_path):
 
     running = True
     while running:
-        clock.tick(2)  # Control simulation speed
+        clock.tick(2)  
 
         # Process Pygame events
         for event in pygame.event.get():
@@ -69,5 +69,5 @@ def simulate_trained_model(model_path):
     pygame.quit()
 
 if __name__ == '__main__':
-    # Updated path to DQN model
+    # path to DQN model
     simulate_trained_model("models/dqn/dqn_final_model.zip")

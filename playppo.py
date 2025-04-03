@@ -54,7 +54,7 @@ def simulate_trained_model(model_path):
         state.total_reward += reward
         state.steps += 1
 
-        # Render environment using the provided screen.
+        # Render environment
         render_waste_env(env, screen)
 
         if terminated or truncated:
